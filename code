@@ -1,0 +1,68 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.metrics import classification_report
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+import numpy as np
+import pandas as pd
+from sklearn import metrics
+
+
+import io
+data= pd.read_csv(io.BytesIO(uploaded['pima-indians-diabetes.csv']))
+data
+
+corr=data.corr()
+
+mask=np.triu(np.ones_like(corr,dtype=np.bool))
+
+f, ax = plt.subplots(figsize=(11, 9))
+cmap = sns.diverging_palette(220, 10, as_cmap=True)
+sns.heatmap(corr, mask=mask, cmap=cmap, vmax=.3, center=0,
+            square=True, linewidths=.5, cbar_kws={"shrink": .5})
+            
+            y = data.iloc[:,8]
+print(y)
+#y=y.values.flatten()
+x = data.iloc[:,[0,1,2,3,4,5,6,7]]
+print(x)
+
+X_train, X_test, y_train, y_test = train_test_split(x, y,shuffle=True, test_size=0.1)
+
+import keras
+from keras.models import Sequential
+from keras.layers import Dense
+
+
+model = Sequential()
+model.add(Dense(15, input_dim=8, activation='relu'))
+
+model.add(Dense(29, activation='relu'))
+model.add(Dense(58, activation='relu'))
+model.add(Dense(116, activation='relu'))
+model.add(Dense(51, activation='relu'))
+
+model.add(Dense(1, activation='sigmoid'))
+
+model.compile(loss='binary_crossentropy', optimizer='adam',metrics=['accuracy'])
+
+
+history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=250, batch_size=1)
+
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Model loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Test'], loc='upper left')
+plt.show()
+
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('Model accc')
+plt.ylabel('acc')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Test'], loc='upper left')
+plt.show()
+
